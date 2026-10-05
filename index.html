@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif Grammar: Passive Voice</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        .gradient-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+        .option-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .option-card:hover:not(.disabled) {
+            transform: translateY(-2px);
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER -->
+    <header class="gradient-header text-white py-8 px-4 shadow-lg">
+        <div class="max-w-4xl mx-auto text-center">
+            <span class="bg-blue-500/30 text-blue-100 text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full border border-blue-300/30 mb-3 inline-block">
+                English Grammar Practice
+            </span>
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Kuis Interaktif Passive Voice</h1>
+            <p class="mt-2 text-blue-100 text-sm md:text-base max-w-xl mx-auto">
+                Uji pemahamanmu secara bertahap mulai dari Level A1 (Basic) hingga Level TOEFL (Advanced).
+            </p>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-4xl mx-auto w-full px-4 py-8 flex-grow">
+        
+        <!-- LEVEL SELECTOR TABS -->
+        <div class="flex flex-wrap justify-center gap-2 mb-8" id="levelTabs">
+            <button onclick="selectLevel('A1')" id="tab-A1" class="px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 bg-blue-600 text-white">
+                <i class="fa-solid fa-seedling"></i> Level A1 (Basic)
+            </button>
+            <button onclick="selectLevel('A2')" id="tab-A2" class="px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                <i class="fa-solid fa-tree"></i> Level A2 (Past/Future)
+            </button>
+            <button onclick="selectLevel('B1')" id="tab-B1" class="px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                <i class="fa-solid fa-layer-group"></i> Level B1 (Intermediate)
+            </button>
+            <button onclick="selectLevel('TOEFL')" id="tab-TOEFL" class="px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                <i class="fa-solid fa-graduation-cap"></i> Level TOEFL (Advanced)
+            </button>
+        </div>
+
+        <!-- QUIZ CARD -->
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden" id="quizBox">
+            
+            <!-- PROGRESS BAR -->
+            <div class="bg-slate-100 h-2 w-full">
+                <div id="progressBar" class="bg-blue-600 h-2 transition-all duration-300" style="width: 20%;"></div>
+            </div>
+
+            <div class="p-6 md:p-8">
+                <!-- QUIZ HEADER INFO -->
+                <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                    <div>
+                        <span id="levelBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-blue-100 text-blue-700 uppercase tracking-wider">
+                            Level A1
+                        </span>
+                        <h2 id="levelTitle" class="text-slate-500 text-xs font-semibold mt-1">Simple Present Passive</h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-400 font-semibold uppercase">Soal</span>
+                        <p class="text-lg font-bold text-slate-700"><span id="currentQNum">1</span> / <span id="totalQNum">5</span></p>
+                    </div>
+                </div>
+
+                <!-- QUESTION TEXT -->
+                <div class="mb-6">
+                    <p id="questionContext" class="text-sm text-slate-500 italic mb-1"></p>
+                    <h3 id="questionText" class="text-lg md:text-xl font-bold text-slate-800 leading-relaxed">
+                        Loading Question...
+                    </h3>
+                </div>
+
+                <!-- OPTIONS CONTAINER -->
+                <div id="optionsContainer" class="space-y-3 mb-6">
+                    <!-- Dynamic Options -->
+                </div>
+
+                <!-- EXPLANATION / RATIONALE CARD -->
+                <div id="explanationBox" class="hidden p-4 rounded-xl border mb-6 text-sm transition-all duration-300">
+                    <div class="flex items-start gap-3">
+                        <i id="explanationIcon" class="fa-solid text-lg mt-0.5"></i>
+                        <div>
+                            <h4 id="explanationTitle" class="font-bold mb-1">Pembahasan Grammar:</h4>
+                            <p id="explanationText" class="text-slate-700 leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER NAVIGATION -->
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <button id="prevBtn" onclick="prevQuestion()" class="px-4 py-2 text-slate-500 font-semibold text-sm hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Sebelumnya
+                    </button>
+                    <button id="nextBtn" onclick="nextQuestion()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 disabled:opacity-50">
+                        Selanjutnya <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCORE SUMMARY CARD (Hidden by default) -->
+        <div id="scoreBox" class="hidden bg-white rounded-2xl shadow-xl border border-slate-100 p-8 text-center max-w-lg mx-auto">
+            <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 text-3xl">
+                <i class="fa-solid fa-award"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-800 mb-2">Hasil Latihan Level <span id="completedLevel"></span></h2>
+            <p class="text-slate-600 text-sm mb-6">Berikut adalah rekapitulasi jawaban kamu untuk level ini:</p>
+
+            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 mb-6">
+                <div class="text-5xl font-black text-blue-600 mb-2" id="finalScore">0</div>
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Skor Akhir</div>
+            </div>
+
+            <p id="feedbackText" class="text-sm font-medium text-slate-700 mb-6"></p>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="restartLevel()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Ulangi Level Ini
+                </button>
+                <button onclick="nextLevelOrFinish()" id="nextLevelBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2">
+                    Lanjut Level Berikutnya <i class="fa-solid fa-angles-right"></i>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-xs border-t border-slate-800">
+        <p>© 2026 Modul Grammar Passive Voice • Didesain untuk Pembelajaran Bertahap</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const quizData = {
+            A1: {
+                title: "Simple Present Passive (BE: am/is/are + V3)",
+                questions: [
+                    {
+                        context: "Active: Farmers grow corn in this region.",
+                        question: "Passive: Corn _____ by farmers in this region.",
+                        options: ["is grown", "are grown", "was grown", "is grow"],
+                        correct: 0,
+                        explanation: "Objek 'corn' bersifat uncountable (dianggap singular), sehingga menggunakan 'is' + V3 (grown)."
+                    },
+                    {
+                        context: "Active: The teacher helps the students.",
+                        question: "Passive: The students _____ by the teacher.",
+                        options: ["is helped", "are helped", "was helped", "were helped"],
+                        correct: 1,
+                        explanation: "Objek 'students' bersifat jamak (plural), maka menggunakan 'are' + V3 (helped)."
+                    },
+                    {
+                        context: "Active: Tom opens the door every morning.",
+                        question: "Passive: The door _____ by Tom every morning.",
+                        options: ["is opened", "was opened", "is open", "are opened"],
+                        correct: 0,
+                        explanation: "Subjek pasif 'the door' tunggal (singular) dan tenses-nya Simple Present, jadi gunakan 'is opened'."
+                    },
+                    {
+                        context: "Active: Many people read this magazine.",
+                        question: "Passive: This magazine _____ by many people.",
+                        options: ["are read", "is readed", "is read", "was read"],
+                        correct: 2,
+                        explanation: "'This magazine' bersifat tunggal. Bentuk V3 dari 'read' adalah 'read' (pengucapan /red/), jadi 'is read'."
+                    },
+                    {
+                        context: "Active: She cleans the rooms daily.",
+                        question: "Passive: The rooms _____ daily by her.",
+                        options: ["is cleaned", "are cleaned", "were cleaned", "clean"],
+                        correct: 1,
+                        explanation: "'The rooms' adalah objek jamak (plural), sehingga membutuhkan 'are' + V3 (cleaned)."
+                    }
+                ]
+            },
+            A2: {
+                title: "Past Passive, Future Passive, & By-Phrase",
+                questions: [
+                    {
+                        context: "Active: Bob mailed the package yesterday.",
+                        question: "Passive: The package _____ by Bob yesterday.",
+                        options: ["was mailed", "is mailed", "were mailed", "was mail"],
+                        correct: 0,
+                        explanation: "Kejadian berlalu (yesterday) & subjek 'package' tunggal -> gunakan 'was' + V3 (mailed)."
+                    },
+                    {
+                        context: "Active: Mary will write the report tomorrow.",
+                        question: "Passive: The report _____ by Mary tomorrow.",
+                        options: ["will written", "will be written", "is written", "will being written"],
+                        correct: 1,
+                        explanation: "Rumus Simple Future Passive adalah 'will + be + V3'. Jangan hilangkan kata 'be'."
+                    },
+                    {
+                        context: "Active: Someone stole my purse last night.",
+                        question: "Passive: My purse _____ last night.",
+                        options: ["was stolen", "is stolen", "stole", "was steal"],
+                        correct: 0,
+                        explanation: "Past passive menggunakan 'was stolen'. Frasa 'by someone' dihilangkan karena pelaku tidak diketahui."
+                    },
+                    {
+                        context: "Active: They are going to build a new house.",
+                        question: "Passive: A new house _____ built next month.",
+                        options: ["is going to be", "will being", "was going to", "is built"],
+                        correct: 0,
+                        explanation: "Rumus Be Going To Passive: am/is/are + going to + be + V3 ('is going to be built')."
+                    },
+                    {
+                        context: "Pilihlah kalimat pasif yang paling tepat:",
+                        question: "William Shakespeare wrote Hamlet.",
+                        options: [
+                            "Hamlet was written by Shakespeare.",
+                            "Hamlet wrote Shakespeare.",
+                            "Hamlet was wrote by Shakespeare.",
+                            "Hamlet is written by Shakespeare."
+                        ],
+                        correct: 0,
+                        explanation: "Pelaku (Shakespeare) penting untuk disebutkan (gunakan 'by'), dan verba yang dipakai adalah V3 (written), bukan V2 (wrote)."
+                    }
+                ]
+            },
+            B1: {
+                title: "Continuous, Perfect, Modals, & Stative Passive",
+                questions: [
+                    {
+                        context: "Active: The mechanics are repairing my car right now.",
+                        question: "Passive: My car _____ right now.",
+                        options: ["is being repaired", "is repaired", "was repaired", "has been repaired"],
+                        correct: 0,
+                        explanation: "Present Continuous Passive menggunakan rumus: am/is/are + being + V3 ('is being repaired')."
+                    },
+                    {
+                        context: "Active: The committee has returned the book to the library.",
+                        question: "Passive: The book _____ to the library.",
+                        options: ["has been returned", "have been returned", "was returned", "is returned"],
+                        correct: 0,
+                        explanation: "Present Perfect Passive menggunakan rumus: have/has + been + V3 ('has been returned')."
+                    },
+                    {
+                        context: "Active: You must treat toxic waste carefully.",
+                        question: "Passive: Toxic waste _____ carefully.",
+                        options: ["must be treated", "must treated", "is treated", "should treated"],
+                        correct: 0,
+                        explanation: "Passive dengan Modal menggunakan rumus: Modal + be + V3 ('must be treated')."
+                    },
+                    {
+                        context: "Active: Someone gave Mrs. Lee an award.",
+                        question: "Pilih kalimat pasif yang alami (orang sebagai subjek utama):",
+                        options: [
+                            "Mrs. Lee was given an award.",
+                            "An award was give to Mrs. Lee.",
+                            "Mrs. Lee was give an award.",
+                            "Mrs. Lee gave an award."
+                        ],
+                        correct: 0,
+                        explanation: "Untuk kalimat dengan 2 objek, meletakkan 'orang' sebagai subjek pasif (Mrs. Lee was given...) lebih alami dalam bahasa Inggris."
+                    },
+                    {
+                        context: "Stative Passive (Kondisi/Keadaan):",
+                        question: "Ann is married _____ Alex, and she is interested _____ art.",
+                        options: ["to; in", "with; in", "to; with", "for; in"],
+                        correct: 0,
+                        explanation: "Pasangan preposisi Stative Passive yang benar: 'married to' (bukan with) dan 'interested in'."
+                    }
+                ]
+            },
+            TOEFL: {
+                title: "Inversion, Causative, Reported Passive, & Pitfalls",
+                questions: [
+                    {
+                        context: "Structure Inversion (Negative/Limiting Word):",
+                        question: "Rarely _____ such a shocking report been published in this journal.",
+                        options: ["has", "have", "was", "is"],
+                        correct: 0,
+                        explanation: "Inversion dengan 'Rarely': Kata bantu (has) muncul sebelum subjek 'a more shocking report' (singular)."
+                    },
+                    {
+                        context: "Locative Inversion (Frasa Tempat):",
+                        question: "On top of the mountain _____ an ancient stone temple.",
+                        options: ["was located", "located", "is locate", "was locating"],
+                        correct: 0,
+                        explanation: "Locative Inversion memindahkan kata kerja pasif 'was located' ke depan sebelum subjek 'an ancient stone temple'."
+                    },
+                    {
+                        context: "Inversion pada Conditional Sentence (Omitted 'If'):",
+                        question: "_____ the document been signed yesterday, the crisis would be over.",
+                        options: ["Had", "If", "Should", "Were"],
+                        correct: 0,
+                        explanation: "Penghilangan 'If' pada pengandaian tipe Past Perfect mengubah 'If the document had been...' menjadi 'Had the document been...'."
+                    },
+                    {
+                        context: "Causative Passive (Have/Get Something Done):",
+                        question: "I had my car _____ by a certified mechanic yesterday.",
+                        options: ["repaired", "repair", "repairing", "to repair"],
+                        correct: 0,
+                        explanation: "Pola Causative Passive: Subject + have/get + Object + V3 ('had my car repaired')."
+                    },
+                    {
+                        context: "Analisis Kesalahan (Error Analysis):",
+                        question: "Manakah kalimat yang SECARA GRAMMAR BENAR?",
+                        options: [
+                            "A catastrophic earthquake occurred in Asia.",
+                            "A catastrophic earthquake was occurred in Asia.",
+                            "A catastrophic earthquake has been occurred in Asia.",
+                            "A catastrophic earthquake is occurred in Asia."
+                        ],
+                        correct: 0,
+                        explanation: "'Occur' adalah Intransitive Verb (tidak butuh objek), sehingga TIDAK BISA dipasifkan. Kalimat aktif 'earthquake occurred' adalah yang benar."
+                    }
+                ]
+            }
+        };
+
+        let currentLevel = 'A1';
+        let currentQuestionIndex = 0;
+        let userAnswers = {}; // Stores user selections: { A1: [0, 1, ...], A2: [...] }
+
+        // Initialize Quiz
+        window.onload = function() {
+            initLevelAnswers();
+            loadQuestion();
+        };
+
+        function initLevelAnswers() {
+            Object.keys(quizData).forEach(lvl => {
+                userAnswers[lvl] = new Array(quizData[lvl].questions.length).fill(null);
+            });
+        }
+
+        function selectLevel(lvl) {
+            currentLevel = lvl;
+            currentQuestionIndex = 0;
+            
+            // Update active tab styles
+            const tabs = ['A1', 'A2', 'B1', 'TOEFL'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === lvl) {
+                    btn.className = "px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 bg-blue-600 text-white";
+                } else {
+                    btn.className = "px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-100 border border-slate-200";
+                }
+            });
+
+            // Show quiz container, hide score container
+            document.getElementById('quizBox').classList.remove('hidden');
+            document.getElementById('scoreBox').classList.add('hidden');
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const data = quizData[currentLevel];
+            const q = data.questions[currentQuestionIndex];
+
+            // Header updates
+            document.getElementById('levelBadge').innerText = `Level ${currentLevel}`;
+            document.getElementById('levelTitle').innerText = data.title;
+            document.getElementById('currentQNum').innerText = currentQuestionIndex + 1;
+            document.getElementById('totalQNum').innerText = data.questions.length;
+
+            // Progress bar
+            const progressPercent = ((currentQuestionIndex + 1) / data.questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+            // Context & Question
+            document.getElementById('questionContext').innerText = q.context || "";
+            document.getElementById('questionText').innerText = q.question;
+
+            // Options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            const selectedOption = userAnswers[currentLevel][currentQuestionIndex];
+            const isAnswered = selectedOption !== null;
+
+            q.options.forEach((opt, idx) => {
+                const optBtn = document.createElement('button');
+                optBtn.className = `w-full text-left p-4 rounded-xl border-2 font-medium text-sm flex items-center justify-between option-card ${isAnswered ? 'disabled cursor-default' : ''}`;
+
+                let badgeLetter = String.fromCharCode(65 + idx); // A, B, C, D
+                
+                if (!isAnswered) {
+                    optBtn.classList.add('border-slate-200', 'bg-white', 'text-slate-700', 'hover:border-blue-400');
+                    optBtn.onclick = () => handleAnswer(idx);
+                } else {
+                    if (idx === q.correct) {
+                        // Correct option
+                        optBtn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-900');
+                    } else if (idx === selectedOption) {
+                        // Wrong selected option
+                        optBtn.classList.add('border-rose-500', 'bg-rose-50', 'text-rose-900');
+                    } else {
+                        // Unselected other options
+                        optBtn.classList.add('border-slate-100', 'bg-slate-50', 'text-slate-400');
+                    }
+                }
+
+                optBtn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-500">${badgeLetter}</span>
+                        <span>${opt}</span>
+                    </div>
+                    ${isAnswered && idx === q.correct ? '<i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>' : ''}
+                    ${isAnswered && idx === selectedOption && idx !== q.correct ? '<i class="fa-solid fa-circle-xmark text-rose-500 text-lg"></i>' : ''}
+                `;
+
+                optionsContainer.appendChild(optBtn);
+            });
+
+            // Handle Explanation box
+            const explanationBox = document.getElementById('explanationBox');
+            if (isAnswered) {
+                explanationBox.classList.remove('hidden');
+                const isCorrect = selectedOption === q.correct;
+                
+                if (isCorrect) {
+                    explanationBox.className = "p-4 rounded-xl border mb-6 text-sm bg-emerald-50 border-emerald-200 text-emerald-900";
+                    document.getElementById('explanationIcon').className = "fa-solid fa-circle-check text-emerald-600 text-lg mt-0.5";
+                    document.getElementById('explanationTitle').innerText = "Jawaban Benar!";
+                } else {
+                    explanationBox.className = "p-4 rounded-xl border mb-6 text-sm bg-rose-50 border-rose-200 text-rose-900";
+                    document.getElementById('explanationIcon').className = "fa-solid fa-circle-xmark text-rose-600 text-lg mt-0.5";
+                    document.getElementById('explanationTitle').innerText = "Jawaban Belum Tepat";
+                }
+                document.getElementById('explanationText').innerText = q.explanation;
+            } else {
+                explanationBox.classList.add('hidden');
+            }
+
+            // Navigation Buttons State
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentQuestionIndex === data.questions.length - 1) {
+                nextBtn.innerHTML = `Selesai & Lihat Skor <i class="fa-solid fa-check-double"></i>`;
+            } else {
+                nextBtn.innerHTML = `Selanjutnya <i class="fa-solid fa-arrow-right"></i>`;
+            }
+        }
+
+        function handleAnswer(idx) {
+            userAnswers[currentLevel][currentQuestionIndex] = idx;
+            loadQuestion();
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            const data = quizData[currentLevel];
+            if (userAnswers[currentLevel][currentQuestionIndex] === null) {
+                alert("Silakan pilih salah satu jawaban terlebih dahulu!");
+                return;
+            }
+
+            if (currentQuestionIndex < data.questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                showScoreSummary();
+            }
+        }
+
+        function showScoreSummary() {
+            const data = quizData[currentLevel];
+            let correctCount = 0;
+
+            userAnswers[currentLevel].forEach((ans, idx) => {
+                if (ans === data.questions[idx].correct) {
+                    correctCount++;
+                }
+            });
+
+            const score = (correctCount / data.questions.length) * 100;
+
+            document.getElementById('quizBox').classList.add('hidden');
+            document.getElementById('scoreBox').classList.remove('hidden');
+
+            document.getElementById('completedLevel').innerText = currentLevel;
+            document.getElementById('finalScore').innerText = score;
+
+            const feedbackText = document.getElementById('feedbackText');
+            if (score === 100) {
+                feedbackText.innerText = "Sangat Luar Biasa! Kamu menguasai materi level ini dengan sempurna.";
+            } else if (score >= 60) {
+                feedbackText.innerText = "Bagus sekali! Pemahaman dasar kamu sudah cukup kuat. Tetap berlatih ya!";
+            } else {
+                feedbackText.innerText = "Jangan berkecil hati! Pelajari kembali materi modul di bagian ini dan coba lagi.";
+            }
+
+            // Next level button configuration
+            const nextLevelBtn = document.getElementById('nextLevelBtn');
+            if (currentLevel === 'A1') nextLevelBtn.setAttribute('onclick', "selectLevel('A2')");
+            else if (currentLevel === 'A2') nextLevelBtn.setAttribute('onclick', "selectLevel('B1')");
+            else if (currentLevel === 'B1') nextLevelBtn.setAttribute('onclick', "selectLevel('TOEFL')");
+            else {
+                nextLevelBtn.innerText = "Selamat! Semua Level Selesai";
+                nextLevelBtn.setAttribute('onclick', "selectLevel('A1')");
+            }
+        }
+
+        function restartLevel() {
+            userAnswers[currentLevel] = new Array(quizData[currentLevel].questions.length).fill(null);
+            selectLevel(currentLevel);
+        }
+    </script>
+</body>
+</html>
